@@ -19,13 +19,22 @@ public class Cache<Key,Value> {
   }
   
   public Value get(Key key) {
-	  System.out.println(map.get(key));
 	  Value res = null;
 	  if(storage.read(key) == null){
 		  lru.addFirst(key);
 	  }else {
-		 res = storage.read(key); 
-		 CacheCell cell = new CacheCell<key, res>;
+		 res = storage.read(key);
+		 lru.addFirst(key);
+		 CacheCell cell = new CacheCell<Key, Value>(res,false,lru.first());
+		 map.put(key, cell);
+		 if(lru.size()>this.maxCacheSize) {
+			 map.remove(lru.first().element());
+			 lru.remove(lru.last());
+			 if(cell.getDirty()) {
+				 storage.write(key, res);
+			 }
+		 }
+		  
 	  }
     return res;
   }
@@ -34,4 +43,3 @@ public class Cache<Key,Value> {
     // CAMBIA este metodo
   }
 }
-
