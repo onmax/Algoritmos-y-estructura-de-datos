@@ -30,8 +30,10 @@ public class Cache<Key,Value> {
 			}
 		}
 		if(esta) {
-			lru.set(lru.first(), key);
+			lru.remove(lru.first());
+			lru.addFirst(key);
 			res = storage.read(key);
+			System.out.println(lru.first().element().toString());
 		}
 		else {
 			res = storage.read(key);
@@ -45,7 +47,6 @@ public class Cache<Key,Value> {
 					storage.write(key, res);
 				}
 			}
-
 		}
 		return res;
 	}
