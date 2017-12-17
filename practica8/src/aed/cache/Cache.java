@@ -29,11 +29,12 @@ public class Cache<Key,Value> {
 				esta=true;
 			}
 		}
+
 		if(esta) {
-			lru.remove(lru.first());
-			lru.addFirst(key);
+			Position<Key> aux=lru.first();
+			lru.addBefore(lru.first(),key);
+			lru.remove(aux);
 			res = storage.read(key);
-			System.out.println(lru.first().element().toString());
 		}
 		else {
 			res = storage.read(key);
@@ -53,9 +54,21 @@ public class Cache<Key,Value> {
 
 	public void put(Key key, Value value) {
 		Value res = null;
-		if(storage.read(key) == null){
-			lru.addFirst(key);
-		}else {
+		boolean esta=false;
+		Iterator<Key> cursor=map.keys();
+		while(cursor.hasNext()) {
+			if(cursor.next().equals(key)) {
+				esta=true;
+			}
+		}
+
+		if(esta) {
+			Position<Key> aux=lru.first();
+			lru.addBefore(lru.first(),key);
+			lru.remove(aux);
+			res = storage.read(key);
+		}
+		else {
 			res = storage.read(key);
 			lru.addFirst(key);
 			CacheCell cell = new CacheCell<Key, Value>(res,false,lru.first());
@@ -67,6 +80,8 @@ public class Cache<Key,Value> {
 					storage.write(key, res);
 				}
 			}
+			cell.setValue(value);
+			cell.setDirty(true);
 
 		}
 	}
