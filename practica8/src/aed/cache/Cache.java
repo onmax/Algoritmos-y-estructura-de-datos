@@ -1,6 +1,5 @@
 package aed.cache;
 
-import java.util.Iterator;
 
 import es.upm.aedlib.Position;
 import es.upm.aedlib.map.*;
@@ -30,13 +29,14 @@ public class Cache<Key, Value> {
 		} else {
 			res = storage.read(key);
 			lru.addFirst(key);
-			CacheCell cell = new CacheCell<Key, Value>(res, false, lru.first());
+			CacheCell<Key,Value> cell = new CacheCell<Key, Value>(res, false, lru.first());
 			map.put(key, cell);
 			if (lru.size() > this.maxCacheSize) {
-				map.remove(lru.last().element());
+				Key aux=lru.last().element();
+				CacheCell<Key,Value> cell2 = map.remove(lru.last().element());				
 				lru.remove(lru.last());
-				if (cell.getDirty()) {
-					storage.write(key, res);
+				if (cell2.getDirty()) {
+					storage.write(aux, cell2.getValue());
 				}
 			}
 		}
@@ -54,13 +54,14 @@ public class Cache<Key, Value> {
 		} else {
 			res = storage.read(key);
 			lru.addFirst(key);
-			CacheCell cell = new CacheCell<Key, Value>(res, false, lru.first());
+			CacheCell<Key,Value> cell = new CacheCell<Key, Value>(res, false, lru.first());
 			map.put(key, cell);
 			if (lru.size() > this.maxCacheSize) {
-				map.remove(lru.last().element());
+				Key aux=lru.last().element();
+				CacheCell<Key,Value> cell2 = map.remove(lru.last().element());				
 				lru.remove(lru.last());
-				if (cell.getDirty()) {
-					storage.write(key, res);
+				if (cell2.getDirty()) {
+					storage.write(aux, cell2.getValue());
 				}
 			}
 		}
